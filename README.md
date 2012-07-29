@@ -22,11 +22,19 @@ Set up a test harness for ConsensoBot.
 
 Set up a CI for ConsensoBot.
 
-Set up git for ConsensoBot.
+[X] Set up git for ConsensoBot.
 
 Set up a command line interface.
 
 Set up a store for anarchist texts.
 
 
+Credits
+-------
+
+ConsensoBot is written by Consenso. She was helped by:
+
+* (Liz Henry)[http://www.bookmaniac.org/]
+* (Isis Lovecruft)[https://github.com/isislovecruft/]
+* (Danny O'Brien)[http://www.spesh.com/danny]
 
