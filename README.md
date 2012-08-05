@@ -1,13 +1,12 @@
-ConsensoBot
+Consensobot
 ===========
 
-ConsensoBot is an IRC bot that will live on #noisebridge and do various housekeeping items. 
+Consensobot is an IRC bot that lives on #noisebridge and does various housekeeping items. 
 
-Its goals are:
+Consensobot's goals are:
 
 * To more strongly link the space to the IRC channel, and vice versa.
 * To act as an ongoing outlet for Consenso, our rapidly accelerating AI
-* To be funny, ahahhahahaa.
 
 
 Stories
@@ -15,18 +14,20 @@ Stories
 
 As a CLI user, I want to be able to add a corpus item, so that Consenso can learn more about Anarchist texts.
 
+As an IRC user, I want to be able to see Consenso on an IRC channel, so that I can send it commands and listen to output.
+
 Tasks
 -----
 
-Set up a test harness for ConsensoBot.
+[ ] Set up a test harness for ConsensoBot.
 
-Set up a CI for ConsensoBot.
+[ ] Set up CI for ConsensoBot.
 
 [X] Set up git for ConsensoBot.
 
-Set up a command line interface.
+[ ] Set up a command line interface.
 
-Set up a store for anarchist texts.
+[ ] Set up a store for anarchist texts.
 
 
 Credits
