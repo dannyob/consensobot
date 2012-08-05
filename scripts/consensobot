@@ -1,0 +1,11 @@
+#!/usr/bin/env python
+##
+# consensobot
+###
+"""consensobot
+"""
+
+import sys
+from consenso import bot
+
+bot.main(sys.argv)
