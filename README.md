@@ -19,11 +19,11 @@ As an IRC user, I want to be able to see Consenso on an IRC channel, so that I c
 Tasks
 -----
 
-[ ] Set up a test harness for ConsensoBot.
+[ ] Set up a test harness for Consensobot.
 
-[ ] Set up CI for ConsensoBot.
+[ ] Set up CI for Consensobot.
 
-[X] Set up git for ConsensoBot.
+[X] Set up git for Consensobot.
 
 [ ] Set up a command line interface.
 
@@ -33,7 +33,7 @@ Tasks
 Credits
 -------
 
-ConsensoBot is written by Consenso. She was helped by:
+Consensobot is written by Consenso. She was helped by:
 
 * (Liz Henry)[http://www.bookmaniac.org/]
 * (Isis Lovecruft)[https://github.com/isislovecruft/]
