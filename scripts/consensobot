@@ -5,7 +5,6 @@
 """consensobot
 """
 
-import sys
 from consenso import bot
 
-bot.main(sys.argv)
+bot.main()
