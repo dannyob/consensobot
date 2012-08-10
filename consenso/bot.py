@@ -22,11 +22,6 @@ import datetime
 import errno
 import shutil
 
-
-program_name = 'consensobot'
-
-metadata = get_distribution(program_name).metadata
-
 def mkdir_if_not_there(path):
     try:
         os.makedirs(path)
@@ -36,20 +31,42 @@ def mkdir_if_not_there(path):
         else:
             raise
 
+program_name = 'consensobot'
+metadata = get_distribution(program_name).metadata
+
 data_dir = appdirs.user_data_dir(program_name, metadata.get('organization'))
 mkdir_if_not_there(data_dir)
+storage_dir = os.path.join(data_dir, 'corpus')
+mkdir_if_not_there(storage_dir)
+
+
+def firstline_of_file(path):
+    f = open(path, 'r')
+    l = f.readline().strip()
+    try:
+        while l == "":
+            l = f.readline().strip
+    except EOFError:
+        return "Empty"
+    return l
+
 
 class Corpus():
-    def __init__(self, location=None):
-        self.storage_dir = os.path.join(data_dir, 'corpus')
-        mkdir_if_not_there(self.storage_dir)
-        self.texts = {i: open( os.path.join(self.storage_dir, i), 'r').read() for i in os.listdir(self.storage_dir)}
+    def __init__(self, location=storage_dir):
+        self.storage_dir = location
+        self.texts = {i: firstline_of_file(os.path.join(self.storage_dir, i))
+                for i in os.listdir(self.storage_dir)}
         return
 
     def clear(self):
         for fname in self.texts:
-            os.unlink( os.path.join(self.storage_dir, fname) )
+            os.unlink(os.path.join(self.storage_dir, fname))
         self.texts = {}
+
+    def add_text(self, fileobj):
+        new_path = self._corpus_text_fname(fileobj)
+        shutil.copyfileobj(fileobj, open(new_path, 'w'))
+        self.texts[os.path.split(new_path)[1]]= firstline_of_file(new_path)
 
     def _corpus_text_fname(self, fileobj):
         try:
@@ -61,16 +78,11 @@ class Corpus():
             new_filename = "Untitled"
 
         name, ext = os.path.splitext(new_filename)
-        make_fn = lambda i: os.path.join(self.storage_dir, '%s(%d)%s' % (name, i, ext))
-        for i in xrange(2, sys.maxint):
+        make_fn = lambda i: os.path.join(self.storage_dir, '%s(%d)%s' % (name, i, ext) if i else new_filename)
+        for i in xrange(0, sys.maxint):
             uni_fn = make_fn(i)
             if not os.path.exists(uni_fn):
                 return uni_fn
-
-    def add_text(self, fileobj):
-        new_path = self._corpus_text_fname(fileobj)
-        shutil.copyfileobj(fileobj, open(new_path, 'w'))
-        self.texts[new_path] = [] 
 
 
 def command_add_text(parsed_args):
@@ -78,15 +90,26 @@ def command_add_text(parsed_args):
     corpus.add_text(parsed_args.location)
     print("I have learned {}".format(parsed_args.location.name))
 
+def command_list_text(parsed_args):
+    corpus = Corpus()
+    print("Texts learned")
+    for path in corpus.texts:
+        print('{} "{}"'.format(path, corpus.texts[path]))
 
 def main(args=sys.argv):
     parser = argparse.ArgumentParser(description=metadata.get('summary'),
             epilog="Mail {} <{}> with bugs and features.".format(metadata.get('maintainer'),
                 metadata.get('maintainer_email')))
     subparsers = parser.add_subparsers()
+
     parser_add_text = subparsers.add_parser('add_text',
             help='Adds a text file to corpus of Consenso markov knowledge.')
     parser_add_text.add_argument('location', type=argparse.FileType())
     parser_add_text.set_defaults(func=command_add_text)
+
+    parser_list_text = subparsers.add_parser('list_text',
+            help='Lists texts in the Consenso markov knowledge database.')
+    parser_list_text.set_defaults(func=command_list_text)
+
     parsed_args = parser.parse_args(args)
     parsed_args.func(parsed_args)

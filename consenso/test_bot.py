@@ -44,6 +44,20 @@ class Corpus_class(unittest.TestCase):
         i.add_text(s.StringIO("No I am spartacus"))
         self.assertEquals(len(i.texts), 2)
 
+    def test_translate_fname(self):
+        i = bot.Corpus()
+        i.clear()
+        i.add_text(s.StringIO("I am spartacus"))
+        self.assertEquals(i.texts['Untitled'], 'I am spartacus')
+
+    def test_translate_double_fname(self):
+        i = bot.Corpus()
+        i.clear()
+        i.add_text(s.StringIO("I am spartacus"))
+        i.add_text(s.StringIO("No I am spartacus"))
+        self.assertEquals(i.texts['Untitled(1)'], 'No I am spartacus')
+
+
 if __name__ == '__main__':
     import __main__
     suite = unittest.TestLoader().loadTestsFromModule(__main__)
