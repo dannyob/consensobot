@@ -29,3 +29,4 @@ clean:
 
 test:
 	pysetup run test
+	behave
