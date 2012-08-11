@@ -27,6 +27,9 @@ clean:
 	rm -rf build
 	rm -rf dist
 
+lint:
+	find . -name "build" -prune -or  -exec "file" "{}" ";" | grep Python | cut -d ':' -f 1 |  egrep -v "steps|setup.py" | xargs flake8 
+
 test:
 	pysetup run test
 	behave
