@@ -22,6 +22,7 @@ import errno
 import shutil
 import random
 
+
 def mkdir_if_not_there(path):
     try:
         os.makedirs(path)
@@ -81,13 +82,14 @@ class Corpus():
         try:
             new_filename = None
             new_filename = os.path.split(fileobj.name)[1]
-            if new_filename.startswith('<') and new_filename.endswith('>'):  # ie <stdin>
-                new_filename = new_filename[1:-1]
+            if new_filename.startswith('<') and new_filename.endswith('>'):
+                new_filename = new_filename[1:-1]   # ie <stdin>
         except AttributeError:
             new_filename = "Untitled"
 
         name, ext = os.path.splitext(new_filename)
-        make_fn = lambda i: os.path.join(self.storage_dir, '%s(%d)%s' % (name, i, ext) if i else new_filename)
+        make_fn = lambda i: os.path.join(self.storage_dir,
+                '%s(%d)%s' % (name, i, ext) if i else new_filename)
         for i in xrange(0, sys.maxint):
             uni_fn = make_fn(i)
             if not os.path.exists(uni_fn):
@@ -124,15 +126,16 @@ class Corpus():
         if start_word is None:
             return random.choice(self._start_words)
         else:
-            find_word = [(w1, w2) for (w1, w2) in self._start_words if w1 == start_word]
+            find_word = [(w1, w2)
+                    for (w1, w2) in self._start_words if w1 == start_word]
             if find_word:
                 return find_word[0]
             else:
                 raise KeyError
 
-    def markov(self, max_sentences=1, start_word = None):
-        """ Extracts markov sentences -- text beginning with an uppercase letter,
-        and ending with a full stop."""
+    def markov(self, max_sentences=1, start_word=None):
+        """ Extracts markov sentences -- text beginning with an uppercase
+        letter, and ending with a full stop."""
         self._create_markov_tables()
         word1, word2 = self.get_startwords(start_word)
         result = [word1, word2]
@@ -167,7 +170,8 @@ def command_delete_text(parsed_args):
 
 def main(args=sys.argv[1:]):
     parser = argparse.ArgumentParser(description=metadata.get('summary'),
-            epilog="Mail {} <{}> with bugs and feature requests.".format(metadata.get('maintainer'),
+            epilog="Mail {} <{}> with bugs and feature requests."
+            .format(metadata.get('maintainer'),
                 metadata.get('maintainer_email')))
     subparsers = parser.add_subparsers()
 
