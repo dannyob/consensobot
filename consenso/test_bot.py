@@ -78,7 +78,7 @@ class Corpus_class(unittest.TestCase):
         i = bot.Corpus()
         i.clear_text()
         i.add_text(file('test_data/test_corpus.txt', 'r'))
-        markov = i.markov(max_sentences=1, start_word='Pontefract')
+        markov = i.markov_sentence(sentences=1, start_word='Pontefract')
         self.assertIn('Miserabilis', markov)
 
     def test_can_generate_markov_sentence(self):
@@ -86,7 +86,7 @@ class Corpus_class(unittest.TestCase):
         i.clear_text()
         i.add_text(s.StringIO("I am spartacus loosely."))
         i.add_text(s.StringIO("No I am spartacus splendidly."))
-        markov = i.markov(max_sentences=1)
+        markov = i.markov_sentence(sentences=1)
         self.assert_(markov.endswith('.'))
 
 
