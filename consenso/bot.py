@@ -55,20 +55,24 @@ class Corpus():
     def __init__(self, location=storage_dir):
         self.storage_dir = location
         self.texts = {i: firstline_of_file(os.path.join(self.storage_dir, i))
-                for i in os.listdir(self.storage_dir)}
+                      for i in os.listdir(self.storage_dir)}
+        self._dirty_markov_tables()
         return
 
     def clear_text(self):
         for fname in self.texts:
             os.unlink(os.path.join(self.storage_dir, fname))
         self.texts = {}
+        self._dirty_markov_tables()
 
     def add_text(self, fileobj):
+        self._dirty_markov_tables()
         new_path = self._corpus_text_fname(fileobj)
         shutil.copyfileobj(fileobj, open(new_path, 'w'))
         self.texts[os.path.split(new_path)[1]] = firstline_of_file(new_path)
 
     def delete_text(self, text_to_delete):
+        self._dirty_markov_tables()
         path_to_delete = os.path.join(self.storage_dir, text_to_delete)
         os.unlink(path_to_delete)
         print("I have forgotten {}".format(text_to_delete))
@@ -88,6 +92,52 @@ class Corpus():
             uni_fn = make_fn(i)
             if not os.path.exists(uni_fn):
                 return uni_fn
+
+    def _dirty_markov_tables(self):
+        self._table = None
+        self._start_words = None
+
+    def _create_markov_tables(self):
+        if self._table:
+            return
+        nonword = '\n'
+        w1 = nonword
+        w2 = nonword
+        table = {}
+        start_words = []
+        for f in self.texts:
+            for l in open(os.path.join(self.storage_dir, f), 'r'):
+                for word in l.split():
+                    table.setdefault((w1, w2), []).append(word)
+                    if w1[0].isupper():
+                        start_words.append((w1, w2))
+                    w1, w2 = w2, word
+        self._table = table
+        self._start_words = start_words
+
+    def get_triplet(self, trip1, trip2):
+        self._create_markov_tables()
+        return self._table[(trip1, trip2)]
+
+    def get_startwords(self):
+        self._create_markov_tables()
+        return random.choice(self._start_words)
+
+    def markov(self, max_sentences=1):
+        """ Extracts markov sentences -- text beginning with an uppercase letter,
+        and ending with a full stop."""
+        self._create_markov_tables()
+        word1, word2 = self.get_startwords()
+        result = [word1, word2]
+        sentences_to_go = max_sentences
+        while sentences_to_go:
+            next_word = random.choice(self.get_triplet(result[-2], result[-1]))
+            result.append(next_word)
+            if next_word.endswith('.') and sentences_to_go:
+                sentences_to_go -= 1
+                if sentences_to_go == 0:
+                    break
+        return ' '.join(result)
 
 
 def command_add_text(parsed_args):
