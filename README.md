@@ -16,19 +16,7 @@ As a CLI user, I want to be able to add a corpus item, so that Consenso can lear
 
 As an IRC user, I want to be able to see Consenso on an IRC channel, so that I can send it commands and listen to output.
 
-Tasks
------
-
-[ ] Set up a test harness for Consensobot.
-
-[ ] Set up CI for Consensobot.
-
-[X] Set up git for Consensobot.
-
-[ ] Set up a command line interface.
-
-[ ] Set up a store for anarchist texts.
-
+As an administrator, I want to be able to push Consenso to a remote machine, and have it install and run.
 
 Credits
 -------
