@@ -119,15 +119,22 @@ class Corpus():
         self._create_markov_tables()
         return self._table[(trip1, trip2)]
 
-    def get_startwords(self):
+    def get_startwords(self, start_word=None):
         self._create_markov_tables()
-        return random.choice(self._start_words)
+        if start_word is None:
+            return random.choice(self._start_words)
+        else:
+            find_word = [(w1, w2) for (w1, w2) in self._start_words if w1 == start_word]
+            if find_word:
+                return find_word[0]
+            else:
+                raise KeyError
 
-    def markov(self, max_sentences=1):
+    def markov(self, max_sentences=1, start_word = None):
         """ Extracts markov sentences -- text beginning with an uppercase letter,
         and ending with a full stop."""
         self._create_markov_tables()
-        word1, word2 = self.get_startwords()
+        word1, word2 = self.get_startwords(start_word)
         result = [word1, word2]
         sentences_to_go = max_sentences
         while sentences_to_go:

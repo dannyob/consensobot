@@ -74,6 +74,12 @@ class Corpus_class(unittest.TestCase):
         triplet = i.get_triplet("Pontefract", "Miserabilis")
         self.assertIn('--', triplet)
 
+    def test_can_generate_markov_sentence_from_file(self):
+        i = bot.Corpus()
+        i.clear_text()
+        i.add_text(file('test_data/test_corpus.txt', 'r'))
+        markov = i.markov(max_sentences=1, start_word='Pontefract')
+        self.assertIn('Miserabilis', markov)
 
     def test_can_generate_markov_sentence(self):
         i = bot.Corpus()
