@@ -226,6 +226,13 @@ def command_delete_text(parsed_args):
     corpus.delete_text(parsed_args.text_name)
 
 
+def command_markov_text(parsed_args):
+    corpus = Corpus()
+    markov = corpus.markov_sentence(sentences=parsed_args.sentences,
+            start_word=parsed_args.start_word)
+    print(markov)
+
+
 def main(args=sys.argv[1:]):
     parser = argparse.ArgumentParser(description=metadata.get('summary'),
             epilog="Mail {} <{}> with bugs and feature requests."
@@ -246,6 +253,12 @@ def main(args=sys.argv[1:]):
             help='Deletes text in the Consenso markov knowledge database.')
     parser_delete_text.add_argument('text_name', type=str)
     parser_delete_text.set_defaults(func=command_delete_text)
+
+    parser_markov_text = subparsers.add_parser('markov',
+            help='Generate markov sentence(s).')
+    parser_markov_text.add_argument('sentences', type=int, default=1)
+    parser_markov_text.add_argument('--start-word', type=str, default=None)
+    parser_markov_text.set_defaults(func=command_markov_text)
 
     parsed_args = parser.parse_args(args)
     parsed_args.func(parsed_args)

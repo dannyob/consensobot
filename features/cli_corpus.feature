@@ -23,3 +23,9 @@ Feature: command line corpus management
         And there should be 0 text in the corpus
 
 
+    Scenario: Markov me some sentences
+        Given an empty set of texts in the corpus
+        When I type 'consensobot add_text test_data/test_corpus.txt'
+        When I type 'consensobot markov 1 --start-word Pontefract'
+        Then the CLI should output 'Miserabilis'
+
