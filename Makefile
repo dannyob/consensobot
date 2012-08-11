@@ -8,6 +8,7 @@ help:
 	@echo "make install - Install on local system"
 	@echo "make clean - Get rid of scratch and byte files"
 	@echo "make test - Run tests"
+	@echo "make lint - Run flake8 on Python files"
 
 sdist: test clean setuppy
 	pysetup run sdist 
@@ -30,6 +31,10 @@ clean:
 lint:
 	find . -name "build" -prune -or  -exec "file" "{}" ";" | grep Python | cut -d ':' -f 1 |  egrep -v "steps|setup.py" | xargs flake8 
 
-test:
+unittests:
 	pysetup run test
+
+bdd:
 	behave
+
+test: unittests bdd
