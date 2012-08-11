@@ -18,9 +18,9 @@ from distutils2.database import get_distribution
 import appdirs
 import os.path
 import os
-import datetime
 import errno
 import shutil
+import random
 
 def mkdir_if_not_there(path):
     try:
@@ -32,9 +32,9 @@ def mkdir_if_not_there(path):
             raise
 
 program_name = 'consensobot'
+org_name = 'noisebridge'
 metadata = get_distribution(program_name).metadata
-
-data_dir = appdirs.user_data_dir(program_name, metadata.get('organization'))
+data_dir = appdirs.user_data_dir(program_name, org_name)
 mkdir_if_not_there(data_dir)
 storage_dir = os.path.join(data_dir, 'corpus')
 mkdir_if_not_there(storage_dir)
@@ -160,7 +160,7 @@ def command_delete_text(parsed_args):
 
 def main(args=sys.argv[1:]):
     parser = argparse.ArgumentParser(description=metadata.get('summary'),
-            epilog="Mail {} <{}> with bugs and features.".format(metadata.get('maintainer'),
+            epilog="Mail {} <{}> with bugs and feature requests.".format(metadata.get('maintainer'),
                 metadata.get('maintainer_email')))
     subparsers = parser.add_subparsers()
 
