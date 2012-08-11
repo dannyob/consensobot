@@ -58,7 +58,7 @@ class Corpus():
                 for i in os.listdir(self.storage_dir)}
         return
 
-    def clear(self):
+    def clear_text(self):
         for fname in self.texts:
             os.unlink(os.path.join(self.storage_dir, fname))
         self.texts = {}
@@ -66,7 +66,12 @@ class Corpus():
     def add_text(self, fileobj):
         new_path = self._corpus_text_fname(fileobj)
         shutil.copyfileobj(fileobj, open(new_path, 'w'))
-        self.texts[os.path.split(new_path)[1]]= firstline_of_file(new_path)
+        self.texts[os.path.split(new_path)[1]] = firstline_of_file(new_path)
+
+    def delete_text(self, text_to_delete):
+        path_to_delete = os.path.join(self.storage_dir, text_to_delete)
+        os.unlink(path_to_delete)
+        print("I have forgotten {}".format(text_to_delete))
 
     def _corpus_text_fname(self, fileobj):
         try:
@@ -90,13 +95,20 @@ def command_add_text(parsed_args):
     corpus.add_text(parsed_args.location)
     print("I have learned {}".format(parsed_args.location.name))
 
+
 def command_list_text(parsed_args):
     corpus = Corpus()
     print("Texts learned")
     for path in corpus.texts:
         print('{} "{}"'.format(path, corpus.texts[path]))
 
-def main(args=sys.argv):
+
+def command_delete_text(parsed_args):
+    corpus = Corpus()
+    corpus.delete_text(parsed_args.text_name)
+
+
+def main(args=sys.argv[1:]):
     parser = argparse.ArgumentParser(description=metadata.get('summary'),
             epilog="Mail {} <{}> with bugs and features.".format(metadata.get('maintainer'),
                 metadata.get('maintainer_email')))
@@ -110,6 +122,11 @@ def main(args=sys.argv):
     parser_list_text = subparsers.add_parser('list_text',
             help='Lists texts in the Consenso markov knowledge database.')
     parser_list_text.set_defaults(func=command_list_text)
+
+    parser_delete_text = subparsers.add_parser('delete_text',
+            help='Deletes text in the Consenso markov knowledge database.')
+    parser_delete_text.add_argument('text_name', type=str)
+    parser_delete_text.set_defaults(func=command_delete_text)
 
     parsed_args = parser.parse_args(args)
     parsed_args.func(parsed_args)

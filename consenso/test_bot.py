@@ -33,26 +33,26 @@ class Configuration_directory(unittest.TestCase):
 class Corpus_class(unittest.TestCase):
     def test_can_add_a_work(self):
         i = bot.Corpus()
-        i.clear()
+        i.clear_text()
         i.add_text(s.StringIO("I am spartacus"))
         self.assertEquals(len(i.texts), 1)
 
     def test_can_add_two_works(self):
         i = bot.Corpus()
-        i.clear()
+        i.clear_text()
         i.add_text(s.StringIO("I am spartacus"))
         i.add_text(s.StringIO("No I am spartacus"))
         self.assertEquals(len(i.texts), 2)
 
     def test_translate_fname(self):
         i = bot.Corpus()
-        i.clear()
+        i.clear_text()
         i.add_text(s.StringIO("I am spartacus"))
         self.assertEquals(i.texts['Untitled'], 'I am spartacus')
 
     def test_translate_double_fname(self):
         i = bot.Corpus()
-        i.clear()
+        i.clear_text()
         i.add_text(s.StringIO("I am spartacus"))
         i.add_text(s.StringIO("No I am spartacus"))
         self.assertEquals(i.texts['Untitled(1)'], 'No I am spartacus')
