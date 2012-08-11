@@ -21,6 +21,8 @@
       letters she wrote to her comrades, friends and admires, for like many
       other women in public life, she was a voluminous writer.
 
+    Pontefract Miserabilis -- put here to test the Markov chain
+
            Born shortly after the close of the Civil War, she witnessed
       during her life the most momentous transformation of the nation; she
       saw the change from an agricultural community into an industrial
