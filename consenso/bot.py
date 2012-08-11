@@ -19,6 +19,15 @@ import appdirs
 from distutils2.database import get_distribution
 
 
+program_name = 'consensobot'
+org_name = 'noisebridge'
+metadata = get_distribution(program_name).metadata
+
+# establish default storage directories
+data_dir = appdirs.user_data_dir(program_name, org_name)
+storage_dir = os.path.join(data_dir, 'corpus')
+
+
 def mkdir_if_not_there(path):
     try:
         os.makedirs(path)
@@ -27,16 +36,6 @@ def mkdir_if_not_there(path):
             pass
         else:
             raise
-
-program_name = 'consensobot'
-org_name = 'noisebridge'
-metadata = get_distribution(program_name).metadata
-
-# establish storage directories
-data_dir = appdirs.user_data_dir(program_name, org_name)
-mkdir_if_not_there(data_dir)
-storage_dir = os.path.join(data_dir, 'corpus')
-mkdir_if_not_there(storage_dir)
 
 
 def firstline_of_file(path):
@@ -60,6 +59,7 @@ class Corpus():
             location: a directory, containing only text files.
         """
         self.storage_dir = location
+        mkdir_if_not_there(self.storage_dir)
         self.texts = {i: firstline_of_file(os.path.join(self.storage_dir, i))
                       for i in os.listdir(self.storage_dir)}
         self._dirty_markov_tables()

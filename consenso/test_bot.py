@@ -15,6 +15,7 @@ import unittest
 import bot
 import os
 import os.path
+import tempfile
 
 import StringIO as s
 
@@ -32,61 +33,54 @@ class Configuration_directory(unittest.TestCase):
 
 
 class Corpus_class(unittest.TestCase):
+    def setUp(self):
+        self.corpus_location = os.path.join(tempfile.gettempdir(), 'temp_corpus')
+        self.corpus = bot.Corpus(location=self.corpus_location)
+        self.corpus.clear_text()
+
+    def tearDown(self):
+        self.corpus.clear_text()
+        os.rmdir(self.corpus_location)
+
     def test_can_add_a_work(self):
-        i = bot.Corpus()
-        i.clear_text()
-        i.add_text(s.StringIO("I am spartacus"))
-        self.assertEquals(len(i.texts), 1)
+        self.corpus.add_text(s.StringIO("I am spartacus"))
+        self.assertEquals(len(self.corpus.texts), 1)
 
     def test_can_add_two_works(self):
-        i = bot.Corpus()
-        i.clear_text()
-        i.add_text(s.StringIO("I am spartacus"))
-        i.add_text(s.StringIO("No I am spartacus"))
-        self.assertEquals(len(i.texts), 2)
+        self.corpus.add_text(s.StringIO("I am spartacus"))
+        self.corpus.add_text(s.StringIO("No I am spartacus"))
+        self.assertEquals(len(self.corpus.texts), 2)
 
     def test_can_translate_unnamed_stream_into_fname(self):
-        i = bot.Corpus()
-        i.clear_text()
-        i.add_text(s.StringIO("I am spartacus"))
-        self.assertEquals(i.texts['Untitled'], 'I am spartacus')
+        self.corpus.add_text(s.StringIO("I am spartacus"))
+        self.assertEquals(self.corpus.texts['Untitled'], 'I am spartacus')
 
     def test_can_put_numbers_at_end_of_fname_to_prevent_doubles(self):
-        i = bot.Corpus()
-        i.clear_text()
-        i.add_text(s.StringIO("I am spartacus"))
-        i.add_text(s.StringIO("No I am spartacus"))
-        self.assertEquals(i.texts['Untitled(1)'], 'No I am spartacus')
+        self.corpus.add_text(s.StringIO("I am spartacus"))
+        self.corpus.add_text(s.StringIO("No I am spartacus"))
+        self.assertEquals(self.corpus.texts['Untitled(1)'], 'No I am spartacus')
 
     def test_can_generate_markov_triplet(self):
-        i = bot.Corpus()
-        i.clear_text()
-        i.add_text(s.StringIO("I am spartacus loosely"))
-        i.add_text(s.StringIO("No I am spartacus splendidly"))
-        triplet = i.get_triplet("am", "spartacus")
+        self.corpus.add_text(s.StringIO("I am spartacus loosely"))
+        self.corpus.add_text(s.StringIO("No I am spartacus splendidly"))
+        triplet = self.corpus.get_triplet("am", "spartacus")
         self.assertIn('loosely', triplet)
         self.assertIn('splendidly', triplet)
 
     def test_can_generate_markov_triplet_from_file(self):
-        i = bot.Corpus()
-        i.clear_text()
-        i.add_text(file('test_data/test_corpus.txt', 'r'))
-        triplet = i.get_triplet("Pontefract", "Miserabilis")
+        self.corpus.add_text(file('test_data/test_corpus.txt', 'r'))
+        triplet = self.corpus.get_triplet("Pontefract", "Miserabilis")
         self.assertIn('--', triplet)
 
     def test_can_generate_markov_sentence_from_file(self):
-        i = bot.Corpus()
-        i.clear_text()
-        i.add_text(file('test_data/test_corpus.txt', 'r'))
-        markov = i.markov_sentence(sentences=1, start_word='Pontefract')
+        self.corpus.add_text(file('test_data/test_corpus.txt', 'r'))
+        markov = self.corpus.markov_sentence(sentences=1, start_word='Pontefract')
         self.assertIn('Miserabilis', markov)
 
     def test_can_generate_markov_sentence(self):
-        i = bot.Corpus()
-        i.clear_text()
-        i.add_text(s.StringIO("I am spartacus loosely."))
-        i.add_text(s.StringIO("No I am spartacus splendidly."))
-        markov = i.markov_sentence(sentences=1)
+        self.corpus.add_text(s.StringIO("I am spartacus loosely."))
+        self.corpus.add_text(s.StringIO("No I am spartacus splendidly."))
+        markov = self.corpus.markov_sentence(sentences=1)
         self.assert_(markov.endswith('.'))
 
 
