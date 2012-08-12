@@ -14,12 +14,12 @@ __contributors__ = None
 __license__ = "GPL v3"
 
 from behave import when, then
-from consenso import bot
+from consenso.bot import cli
 
 
 @when(u"I type 'consensobot {args}'")
 def step(context, args=None):
-    bot.main(args.split(' '))
+    cli.main(args.split(' '))
 
 @then(u"the CLI should output '{result}'")
 def step(context, result=None):

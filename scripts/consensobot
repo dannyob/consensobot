@@ -5,6 +5,6 @@
 """consensobot
 """
 
-from consenso import bot
+from consenso.bot import cli
 
-bot.main()
+cli.main()

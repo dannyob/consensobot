@@ -12,7 +12,7 @@ __contributors__ = None
 __license__ = "GPL v3"
 
 import unittest
-import bot
+from consenso.corpus import Corpus, data_dir
 import os
 import os.path
 import tempfile
@@ -22,10 +22,10 @@ import StringIO as s
 
 class Configuration_directory(unittest.TestCase):
     def test_contains_sensible_name(self):
-        self.assertIn('consensobot', bot.data_dir)
+        self.assertIn('consensobot', data_dir)
 
     def test_is_writeable(self):
-        fname = os.path.join(bot.data_dir, 'foo.txt')
+        fname = os.path.join(data_dir, 'foo.txt')
         f = open(fname, 'w')    # throws exception if not writeable
         f.close()
         os.unlink(fname)
@@ -35,7 +35,7 @@ class Configuration_directory(unittest.TestCase):
 class Corpus_class(unittest.TestCase):
     def setUp(self):
         self.corpus_location = os.path.join(tempfile.gettempdir(), 'temp_corpus')
-        self.corpus = bot.Corpus(location=self.corpus_location)
+        self.corpus = Corpus(location=self.corpus_location)
         self.corpus.clear_text()
 
     def tearDown(self):

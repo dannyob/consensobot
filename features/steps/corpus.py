@@ -6,7 +6,7 @@
 
 """
 
-from consenso import bot
+from consenso.corpus import Corpus
 from behave import given, then
 
 __author__ = "Danny O'Brien <http://www.spesh.com/danny/>"
@@ -17,11 +17,11 @@ __license__ = "GPL v3"
 
 @given(u'an empty set of texts in the corpus')
 def step(context):
-    corpus = bot.Corpus()
+    corpus = Corpus()
     corpus.clear_text()
     assert (len(corpus.texts) == 0)
 
 @then(u'there should be {num:d} text in the corpus')
 def step(context, num=0):
-    corpus = bot.Corpus()
+    corpus = Corpus()
     assert (len(corpus.texts) == num)
