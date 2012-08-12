@@ -23,7 +23,8 @@ class MockIRCServer (IRCUser):
             self.privmsg(
                 "Nickserv",
                 nickname,
-                'Your nickname is cannot be decoded.  Please use ASCII or UTF-8.')
+                'Your nickname is cannot be decoded.  \
+                        Please use ASCII or UTF-8.')
             self.transport.loseConnection()
             return
 

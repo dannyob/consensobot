@@ -29,7 +29,7 @@ clean:
 	rm -rf dist
 
 lint:
-	find . -name "build" -prune -or  -exec "file" "{}" ";" | grep Python | cut -d ':' -f 1 |  egrep -v "steps|setup.py" | xargs flake8 
+	find . -name "build" -prune -or  -exec "file" "{}" ";" | grep Python | cut -d ':' -f 1 |  egrep -v "steps|setup.py" | xargs flake8 --max-line-length=100
 
 unittests:
 	pysetup run test

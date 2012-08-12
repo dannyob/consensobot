@@ -6,8 +6,8 @@
 
 """
 
-import os
 from consenso.bot.mock import Ircserver
+
 
 def before_tag(context, tag):
     if tag == 'ircserver':

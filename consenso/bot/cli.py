@@ -19,6 +19,7 @@ from consenso.corpus import Corpus
 program_name = 'consensobot'
 metadata = get_distribution(program_name).metadata
 
+
 def mkdir_if_not_there(path):
     try:
         os.makedirs(path)
@@ -38,6 +39,7 @@ def firstline_of_file(path):
     except EOFError:
         return "Empty"
     return l
+
 
 def command_add_text(parsed_args):
     corpus = Corpus()

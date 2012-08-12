@@ -36,7 +36,8 @@ class Ircserver():
         self._results = ""
 
     def run(self):
-        self._process = subprocess.Popen(os.path.join(this_dir, "mock_ircserver.py"),
+        self._process = subprocess.Popen(
+                os.path.join(this_dir, "mock_ircserver.py"),
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     def output(self):
