@@ -15,7 +15,7 @@ __license__ = "GPL v3"
 
 from twisted.words.protocols import irc
 from twisted.internet import protocol
-from twisted.application import service, internet
+from twisted.application import service
 
 
 class ConsensoBot(irc.IRCClient):
