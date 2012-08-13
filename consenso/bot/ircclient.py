@@ -37,7 +37,7 @@ class IrcClient(object):
 
     def run(self, pidfile=None):
         this_dir = os.path.split(__file__)[0]
-        command = ['twistd', '--python={}'.format(os.path.join(this_dir, 'ConsensoBotTac.py'))]
+        command = ['twistd', '--python={}'.format(os.path.join(this_dir, 'tac.py'))]
         if not pidfile:
             (f, pidfile) = tempfile.NamedTemporaryFile(
                     prefix="consensobot", suffix="pid", delete=False)

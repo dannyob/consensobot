@@ -48,6 +48,4 @@ class ConsensoBotFactory(protocol.ClientFactory):
     def clientConnectionFailed(self, connector, reason):
         print "Could not connect: %s" % (reason,)
 
-application = service.Application("Consenso IRC bot")
-service = internet.TCPClient('localhost', 4567, ConsensoBotFactory('#test'))
-service.setServiceParent(application)
+application = service.Application("Consenso Twisted Application")
