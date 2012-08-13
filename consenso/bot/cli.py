@@ -8,37 +8,14 @@ Runs a consensobot on your choice of IRC network.
 """
 
 import argparse
-import errno
-import os
-import os.path
 import sys
 
 from distutils2.database import get_distribution
 from consenso.corpus import Corpus
+from consenso.bot.ircclient import IrcClient
 
 program_name = 'consensobot'
 metadata = get_distribution(program_name).metadata
-
-
-def mkdir_if_not_there(path):
-    try:
-        os.makedirs(path)
-    except OSError as exc:
-        if exc.errno == errno.EEXIST:
-            pass
-        else:
-            raise
-
-
-def firstline_of_file(path):
-    f = open(path, 'r')
-    l = f.readline().strip()
-    try:
-        while l == "":
-            l = f.readline().strip
-    except EOFError:
-        return "Empty"
-    return l
 
 
 def command_add_text(parsed_args):
@@ -64,6 +41,12 @@ def command_markov_text(parsed_args):
     markov = corpus.markov_sentence(sentences=parsed_args.sentences,
             start_word=parsed_args.start_word)
     print(markov)
+
+
+def command_go_online(parsed_args):
+    irc_client = IrcClient()
+    irc_client.join(parsed_args.url)
+    print "Joined ", parsed_args.url
 
 
 def main(args=sys.argv[1:]):
@@ -92,6 +75,11 @@ def main(args=sys.argv[1:]):
     parser_markov_text.add_argument('sentences', type=int, default=1)
     parser_markov_text.add_argument('--start-word', type=str, default=None)
     parser_markov_text.set_defaults(func=command_markov_text)
+
+    parser_go_online_text = subparsers.add_parser('go_online',
+            help='Join an IRC channel')
+    parser_go_online_text.add_argument('url', type=str)
+    parser_go_online_text.set_defaults(func=command_go_online)
 
     parsed_args = parser.parse_args(args)
     parsed_args.func(parsed_args)
