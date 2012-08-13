@@ -18,17 +18,13 @@ import random
 import errno
 
 from distutils2.database import get_distribution
-import appdirs
+import consenso.directories
 import shutil
 
 
 program_name = 'consensobot'
 org_name = 'noisebridge'
 metadata = get_distribution(program_name).metadata
-
-# establish default storage directories
-data_dir = appdirs.user_data_dir(program_name, org_name)
-storage_dir = os.path.join(data_dir, 'corpus')
 
 
 def mkdir_if_not_there(path):
@@ -56,11 +52,13 @@ class Corpus():
     """A permanent store of texts for Consenso to use in markov chains.
 
     """
-    def __init__(self, location=storage_dir):
+    def __init__(self, location=None):
         """Creates a corpus, with texts stored in location.
         Args:
             location: a directory, containing only text files.
         """
+        if location is None:
+            location = consenso.directories.corpus_dir
         self.storage_dir = location
         mkdir_if_not_there(self.storage_dir)
         self.texts = {i: firstline_of_file(os.path.join(self.storage_dir, i))
