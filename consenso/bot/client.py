@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 ##
-# consenso/bot/ircclient.py
+# consenso/bot/client
 ###
-"""consenso/bot/ircclient.py
+"""consenso/bot/client
 
 """
 
@@ -11,7 +11,6 @@ __copyright__ = "Copyright Danny O'Brien"
 __contributors__ = None
 __license__ = "GPL v3"
 
-import urlparse
 import subprocess
 import os.path
 import tempfile
@@ -20,56 +19,58 @@ import signal
 
 import consenso.directories
 
-furlfile = os.path.join(consenso.directories.foolscap_dir, "root.furl")
 
+class ConsensoProcess(object):
 
-class BotClient(object):
-    def __init__(self):
+    furlfile = os.path.join(consenso.directories.foolscap_dir, "root.furl")
+
+    def __init__(self, pidfile=None, logfile=None):
         self.pid = None
-        self.furl = None
-        self.pidfile = None
-
-    def run(self, pidfile=None, logfile=None):
-        this_dir = os.path.split(__file__)[0]
-        command = ['twistd', '--python={}'.format(os.path.join(this_dir, 'tac.py'))]
+        self._furl = None
         if not pidfile:
             (f, pidfile) = tempfile.NamedTemporaryFile(
                     prefix="consensobot", suffix="pid", delete=False)
             f.close()
         if not logfile:
             logfile = os.path.join(consenso.directories.log_dir, 'client.log')
-        self.pidfile = pidfile
-        command.append("--pidfile={}".format(pidfile))
-        self.logfile = logfile
-        command.append("--logfile={}".format(logfile))
-        if os.path.exists(furlfile):
-            os.unlink(furlfile)
+        self._pidfile = pidfile
+        self._logfile = logfile
+
+    def start(self):
+        this_dir = os.path.split(__file__)[0]
+        command = ['twistd', '--python={}'.format(os.path.join(this_dir, 'tac.py'))]
+        command.append("--pidfile={}".format(self._pidfile))
+        command.append("--logfile={}".format(self._logfile))
+        if os.path.exists(self.furlfile):
+            os.unlink(self.furlfile)
         subprocess.call(command, stderr=subprocess.STDOUT)
         pid = 0
         furl = ""
         while (pid == 0 or furl == ""):  # FIXME shouldn't buzz around a loop, should use select
             try:
-                pid = int(file(self.pidfile, "r").read())
+                pid = int(file(self._pidfile, "r").read())
             except (IOError, ValueError):
                 pid = 0
             try:
-                furl = file(furlfile, "r").read()
+                furl = file(self.furlfile, "r").read()
             except:
                 furl = ""
         self.pid = pid
-        self.furl = furl
+        self._furl = furl
 
-    def join(self, url):
-        components = urlparse.urlparse(url, scheme='irc')
-        self.url = url
-        self.server_port = components.port
-        self.server_hostname = components.hostname
-        self.server_groups = [components.path.strip('/')]
+    def furl(self):
+        if not self._furl:
+            try:
+                furl = file(self.furlfile, "r").read()
+            except IOError:
+                furl = None
+            self._furl = furl
+        return self._furl
 
-    def kill(self):
+    def shutdown(self):
         if self.pid:
             os.kill(self.pid, signal.SIGTERM)
-        if self.pidfile:
-            os.unlink(self.pidfile)
-        if furlfile:
-            os.unlink(furlfile)
+        if self._pidfile:
+            os.unlink(self._pidfile)
+        if self.furlfile:
+            os.unlink(self.furlfile)

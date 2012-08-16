@@ -11,37 +11,34 @@ __copyright__ = "Copyright Danny O'Brien"
 __contributors__ = None
 __license__ = "GPL v3"
 
-#import unittest
 import os
 import os.path
-import signal
 
-from consenso.bot.client import BotClient
+
+from consenso.bot.client import ConsensoProcess
 import twisted.trial.unittest as unittest
 
 
-class Test_BotClient(unittest.TestCase):
+class Test_ConsensoProcess(unittest.TestCase):
     def setUp(self):
-        self.ic = BotClient()
-
-    def test_creates_daemon(self):
         if os.path.exists("/tmp/pidfile"):
             os.unlink("/tmp/pidfile")
-        self.ic.run(pidfile="/tmp/pidfile")
+        self.ic = ConsensoProcess(pidfile="/tmp/pidfile")
+        self.ic.start()
+
+    def test_creates_daemon(self):
         pid = int(open('/tmp/pidfile', 'r').read())
-        if pid:
-            os.kill(pid, signal.SIGTERM)
         self.assertGreater(pid, 0)
 
     def test_got_pid(self):
-        if os.path.exists("/tmp/pidfile"):
-            os.unlink("/tmp/pidfile")
-        self.ic.run(pidfile="/tmp/pidfile")
         pid = int(open('/tmp/pidfile', 'r').read())
         self.assertEqual(pid, self.ic.pid)
 
+    def test_got_furl(self):
+        self.assert_(self.ic.furl())
+
     def tearDown(self):
-        self.ic.kill()
+        self.ic.shutdown()
 
 if __name__ == '__main__':
     import __main__
