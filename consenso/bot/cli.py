@@ -12,7 +12,7 @@ import sys
 
 from distutils2.database import get_distribution
 from consenso.corpus import Corpus
-from consenso.bot.ircclient import IrcClient
+from consenso.bot.client import BotClient
 
 program_name = 'consensobot'
 metadata = get_distribution(program_name).metadata
@@ -44,8 +44,8 @@ def command_markov_text(parsed_args):
 
 
 def command_go_online(parsed_args):
-    irc_client = IrcClient()
-    irc_client.join(parsed_args.url)
+    client = BotClient()
+    client.join(parsed_args.url)
     print "Joined ", parsed_args.url
 
 

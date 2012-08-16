@@ -11,52 +11,36 @@ __copyright__ = "Copyright Danny O'Brien"
 __contributors__ = None
 __license__ = "GPL v3"
 
-import urlparse
-import subprocess
-import os.path
-import tempfile
-import os
-import signal
+from twisted.words.protocols import irc
+from twisted.internet import protocol
 
 
-class BotError(Exception):
-    pass
+class ConsensoBot(irc.IRCClient):
+    def _get_nickname(self):
+        return self.factory.nickname
+    nickname = property(_get_nickname)
+
+    def signedOn(self):
+        self.join(self.factory.channel)
+        print "Signed on as %s." % (self.nickname,)
+
+    def joined(self, channel):
+        print "Joined %s." % (channel,)
+
+    def privmsg(self, user, channel, msg):
+        print msg
 
 
-class ProcessError(BotError):
-    pass
+class ConsensoBotFactory(protocol.ClientFactory):
+    protocol = ConsensoBot
 
+    def __init__(self, channel, nickname='ConsensoSimple'):
+        self.channel = channel
+        self.nickname = nickname
 
-class IrcClient(object):
-    def __init__(self, url):
-        components = urlparse.urlparse(url, scheme='irc')
-        self.url = url
-        self.server_port = components.port
-        self.server_hostname = components.hostname
-        self.server_groups = [components.path.strip('/')]
+    def clientConnectionLost(self, connector, reason):
+        print "Lost connection (%s), reconnecting." % (reason,)
+        connector.connect()
 
-    def run(self, pidfile=None):
-        this_dir = os.path.split(__file__)[0]
-        command = ['twistd', '--python={}'.format(os.path.join(this_dir, 'tac.py'))]
-        if not pidfile:
-            (f, pidfile) = tempfile.NamedTemporaryFile(
-                    prefix="consensobot", suffix="pid", delete=False)
-            f.close()
-        command.append("--pidfile={}".format(pidfile))
-        self.pidfile = pidfile
-        status = subprocess.call(command)
-        if status != 0:
-            raise ProcessError(status)
-        while (1):  # FIXME shouldn't buzz around a loop, should use select
-            try:
-                pid = int(file(self.pidfile, "r").read())
-            except (IOError, ValueError):
-                pid = 0
-            if pid > 0:
-                break
-        self.pid = int(file(self.pidfile, "r").read())
-
-    def kill(self):
-        self.pid = int(file(self.pidfile, "r").read())
-        os.kill(self.pid, signal.SIGTERM)
-        os.unlink(self.pidfile)
+    def clientConnectionFailed(self, connector, reason):
+        print "Could not connect: %s" % (reason,)
