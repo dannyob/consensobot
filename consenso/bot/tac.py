@@ -21,18 +21,21 @@ from foolscap.api import Referenceable, Tub
 
 import consenso.directories
 
+furlfile = os.path.join(consenso.directories.foolscap_dir, "root.furl")
+
 
 class RemoteControl(Referenceable):
     def remote_irc_joint(self, host, port, group=None, nick=None):
         print "I am trying to join {} on {}:{} as {}".format(group, host, port, nick)
 
-myserver = RemoteControl()
-tub = Tub(certFile=os.path.join(consenso.directories.foolscap_dir, "pb2server.pem"))
-tub.listenOn("tcp:12345")
-tub.setLocation("localhost:12345")
-url = tub.registerReference(myserver, "remote-control")
-print("pid ", os.getpid())
-print("furl ", url)
+
+def get_tub():
+    myserver = RemoteControl()
+    tub = Tub(certFile=os.path.join(consenso.directories.foolscap_dir, "pb2server.pem"))
+    tub.listenOn("tcp:12345")
+    tub.setLocation("localhost:12345")
+    tub.registerReference(myserver, "remote-control", furlFile=furlfile)
+    return tub
 
 application = service.Application("Consenso Twisted Application")
-tub.setServiceParent(application)
+get_tub().setServiceParent(application)
