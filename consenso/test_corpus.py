@@ -36,6 +36,7 @@ class Configuration_directory(unittest.TestCase):
 class Corpus_class(unittest.TestCase):
     def setUp(self):
         self.corpus_location = os.path.join(tempfile.gettempdir(), 'temp_corpus')
+        os.mkdir(self.corpus_location)
         self.corpus = Corpus(location=self.corpus_location)
         self.corpus.clear_text()
 

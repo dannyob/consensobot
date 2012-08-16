@@ -15,7 +15,6 @@ __license__ = "GPL v3"
 import os
 import sys
 import random
-import errno
 
 from distutils2.database import get_distribution
 import consenso.directories
@@ -25,16 +24,6 @@ import shutil
 program_name = 'consensobot'
 org_name = 'noisebridge'
 metadata = get_distribution(program_name).metadata
-
-
-def mkdir_if_not_there(path):
-    try:
-        os.makedirs(path)
-    except OSError as exc:
-        if exc.errno == errno.EEXIST:
-            pass
-        else:
-            raise
 
 
 def firstline_of_file(path):
@@ -60,7 +49,6 @@ class Corpus():
         if location is None:
             location = consenso.directories.corpus_dir
         self.storage_dir = location
-        mkdir_if_not_there(self.storage_dir)
         self.texts = {i: firstline_of_file(os.path.join(self.storage_dir, i))
                       for i in os.listdir(self.storage_dir)}
         self._dirty_markov_tables()
