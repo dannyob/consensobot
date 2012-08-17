@@ -15,8 +15,13 @@ import subprocess
 import os.path
 import os
 import signal
+import errno
 
 import consenso.directories
+
+
+class NoGoodFurl(Exception):
+    pass
 
 
 class ConsensoProcess(object):
@@ -33,8 +38,26 @@ class ConsensoProcess(object):
             logfile = os.path.join(consenso.directories.log_dir, 'client.log')
         self._pidfile = pidfile
         self._logfile = logfile
+        try:
+            pid = int(file(self._pidfile, "r").read())
+        except (IOError, ValueError):
+            return
+        try:
+            os.kill(pid, 0)
+        except (IOError, OSError) as e:
+            if e.errno in (errno.ENOENT, errno.ESRCH):
+                return
+            raise
+        self.pid = pid
+        try:
+            self.furl()
+        except NoGoodFurl:
+            print "I found a running ConsensoProcess but not a valid furl"
+            raise
 
     def start(self):
+        if self.pid:
+            return
         this_dir = os.path.split(__file__)[0]
         command = ['twistd', '--python={}'.format(os.path.join(this_dir, 'tac.py'))]
         command.append("--pidfile={}".format(self._pidfile))
@@ -63,6 +86,7 @@ class ConsensoProcess(object):
             except IOError as e:
                 print e
                 print "Have you remembered to start() the ConsensoProcess?"
+                raise NoGoodFurl
             self._furl = furl
         return self._furl
 

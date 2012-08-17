@@ -37,6 +37,12 @@ class Test_ConsensoProcess(unittest.TestCase):
     def test_got_furl(self):
         self.assert_(self.ic.furl())
 
+    def test_second_process(self):
+        """ Should just return with the pid and furl of previous one """
+        second_ic = ConsensoProcess(pidfile="/tmp/pidfile")
+        self.assertEquals(second_ic.pid, self.ic.pid)
+        self.assertEquals(second_ic.furl(), self.ic.furl())
+
     def tearDown(self):
         self.ic.shutdown()
 
