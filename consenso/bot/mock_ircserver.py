@@ -6,6 +6,8 @@
 
 """
 
+import sys
+
 from twisted.words.service import InMemoryWordsRealm, IRCFactory, IRCUser, Group
 from twisted.cred import checkers, portal, credentials
 from twisted.internet import reactor, defer, task
@@ -35,14 +37,14 @@ class MockIRCServer (IRCUser):
 
         self.password = None
         self.logInAs(nickname, password)
-        print(nickname, "appeared.")
+        print("{} appeared.".format(nickname))
         pass
 
     def userJoined(self, group, user):
-        print(user.name, "joined", group.name)
+        print("{} joined {}".format(user.name, group.name))
 
     def userLeft(self, group, user, reason=None):
-        print(user.name, "left", group.name)
+        print("{} left {}".format(user.name, group.name))
 
 
 class MockIRCFactory(IRCFactory):
@@ -82,6 +84,7 @@ if __name__ == '__main__':
 
     def end_me():
         reactor.stop()
-    d = task.deferLater(reactor, 5, end_me)  # kill myself after 5 seconds
-    print "Running on port 4567, localhost"
+    d = task.deferLater(reactor, 5, end_me)  # kill myself after 20 seconds
+    print "Running on port 4567, localhost\n"
+    sys.stdout.flush()
     reactor.run()

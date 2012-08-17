@@ -29,7 +29,7 @@ class ConsensoBot(irc.IRCClient):
 class ConsensoBotFactory(protocol.ClientFactory):
     protocol = ConsensoBot
 
-    def __init__(self, channel, nickname='ConsensoSimple'):
+    def __init__(self, channel, nickname='Consenso'):
         self.channel = channel
         self.nickname = nickname
 
