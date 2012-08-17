@@ -9,12 +9,6 @@
 from consenso.corpus import Corpus
 from behave import given, then
 
-__author__ = "Danny O'Brien <http://www.spesh.com/danny/>"
-__copyright__ = "Copyright Danny O'Brien"
-__contributors__ = None
-__license__ = "GPL v3"
-
-
 @given(u'an empty set of texts in the corpus')
 def step(context):
     corpus = Corpus()

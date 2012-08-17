@@ -9,11 +9,6 @@ Twisted Application .tac file for the Consenso process.
 See <http://twistedmatrix.com/documents/current/core/howto/application.html>
 """
 
-__author__ = "Danny O'Brien <http://www.spesh.com/danny/>"
-__copyright__ = "Copyright Danny O'Brien"
-__contributors__ = None
-__license__ = "GPL v3"
-
 import os
 import urlparse
 
