@@ -11,8 +11,13 @@ import argparse
 import sys
 
 from distutils2.database import get_distribution
+
+from twisted.internet import reactor
+from foolscap.api import Tub
+
 from consenso.corpus import Corpus
-from consenso.bot.client import BotClient
+from consenso.bot.client import ConsensoProcess
+
 
 program_name = 'consensobot'
 metadata = get_distribution(program_name).metadata
@@ -44,9 +49,31 @@ def command_markov_text(parsed_args):
 
 
 def command_go_online(parsed_args):
-    client = BotClient()
-    client.join(parsed_args.url)
-    print "Joined ", parsed_args.url
+    client = ConsensoProcess()
+    client.start()
+    furl = client.furl()
+    print furl
+    tub = Tub()
+    tub.startService()
+
+    def got_error(err):
+        print "ERROR", err
+        reactor.stop()
+
+    def got_result(res):
+        print(res)
+
+    def got_remote(remote):
+        d = remote.callRemote("join", parsed_args.url)
+        d.addCallback(got_result)
+        d.addCallback(lambda res: reactor.stop())
+        d.addErrback(got_error)
+        return d
+
+    d = tub.getReference(furl)
+    d.addCallback(got_remote)
+    d.addErrback(got_error)
+    reactor.run()
 
 
 def main(args=sys.argv[1:]):

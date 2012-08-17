@@ -25,7 +25,7 @@ furlfile = os.path.join(consenso.directories.foolscap_dir, "root.furl")
 
 
 class RemoteControl(Referenceable):
-    def remote_irc_joint(self, host, port, group=None, nick=None):
+    def remote_join(self, host, port, group=None, nick=None):
         print "I am trying to join {} on {}:{} as {}".format(group, host, port, nick)
 
 
