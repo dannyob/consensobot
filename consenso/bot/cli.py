@@ -52,7 +52,6 @@ def command_go_online(parsed_args):
     client = ConsensoProcess()
     client.start()
     furl = client.furl()
-    print furl
     tub = Tub()
     tub.startService()
 

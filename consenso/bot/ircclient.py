@@ -17,13 +17,13 @@ class ConsensoBot(irc.IRCClient):
 
     def signedOn(self):
         self.join(self.factory.channel)
-        print "Signed on as %s." % (self.nickname,)
+        print("Signed on as %s." % (self.nickname,))
 
     def joined(self, channel):
-        print "Joined %s." % (channel,)
+        print("Joined %s." % (channel,))
 
     def privmsg(self, user, channel, msg):
-        print msg
+        print(msg)
 
 
 class ConsensoBotFactory(protocol.ClientFactory):
@@ -34,8 +34,8 @@ class ConsensoBotFactory(protocol.ClientFactory):
         self.nickname = nickname
 
     def clientConnectionLost(self, connector, reason):
-        print "Lost connection (%s), reconnecting." % (reason,)
+        print("Lost connection (%s), reconnecting." % (reason,))
         connector.connect()
 
     def clientConnectionFailed(self, connector, reason):
-        print "Could not connect: %s" % (reason,)
+        print("Could not connect: %s" % (reason,))

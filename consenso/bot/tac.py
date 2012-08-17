@@ -23,7 +23,6 @@ furlfile = os.path.join(consenso.directories.foolscap_dir, "root.furl")
 
 class RemoteControl(Referenceable):
     def remote_join(self, url):
-        print url
         components = urlparse.urlparse(url, scheme='irc')
         if components.port:
             server_port = components.port

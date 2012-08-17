@@ -85,6 +85,6 @@ if __name__ == '__main__':
     def end_me():
         reactor.stop()
     d = task.deferLater(reactor, 5, end_me)  # kill myself after 20 seconds
-    print "Running on port 4567, localhost\n"
+    print "Running on port 4567, localhost"
     sys.stdout.flush()
     reactor.run()
