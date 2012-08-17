@@ -13,7 +13,6 @@ __license__ = "GPL v3"
 
 import subprocess
 import os.path
-import tempfile
 import os
 import signal
 
@@ -23,14 +22,13 @@ import consenso.directories
 class ConsensoProcess(object):
 
     furlfile = os.path.join(consenso.directories.foolscap_dir, "root.furl")
+    default_pidfile = os.path.join(consenso.directories.foolscap_dir, "pid")
 
     def __init__(self, pidfile=None, logfile=None):
         self.pid = None
         self._furl = None
         if not pidfile:
-            (f, pidfile) = tempfile.NamedTemporaryFile(
-                    prefix="consensobot", suffix="pid", delete=False)
-            f.close()
+            pidfile = self.default_pidfile
         if not logfile:
             logfile = os.path.join(consenso.directories.log_dir, 'client.log')
         self._pidfile = pidfile
@@ -43,7 +41,7 @@ class ConsensoProcess(object):
         command.append("--logfile={}".format(self._logfile))
         if os.path.exists(self.furlfile):
             os.unlink(self.furlfile)
-        subprocess.call(command, stderr=subprocess.STDOUT)
+        subprocess.check_call(command, stderr=subprocess.STDOUT)
         pid = 0
         furl = ""
         while (pid == 0 or furl == ""):  # FIXME shouldn't buzz around a loop, should use select
@@ -62,8 +60,9 @@ class ConsensoProcess(object):
         if not self._furl:
             try:
                 furl = file(self.furlfile, "r").read()
-            except IOError:
-                furl = None
+            except IOError as e:
+                print e
+                print "Have you remembered to start() the ConsensoProcess?"
             self._furl = furl
         return self._furl
 
