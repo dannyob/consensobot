@@ -38,13 +38,16 @@ class MockIRCServer (IRCUser):
         self.password = None
         self.logInAs(nickname, password)
         print("{} appeared.".format(nickname))
+        sys.stdout.flush()
         pass
 
     def userJoined(self, group, user):
         print("{} joined {}".format(user.name, group.name))
+        sys.stdout.flush()
 
     def userLeft(self, group, user, reason=None):
         print("{} left {}".format(user.name, group.name))
+        sys.stdout.flush()
 
 
 class MockIRCFactory(IRCFactory):

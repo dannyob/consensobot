@@ -6,16 +6,16 @@ Feature: command line IRC management
 
     Scenario: Have mock IRC server
         Given a mock IRC server on localhost:4567
-        Then the mock IRC server should output 'Running on port 4567, localhost'
+        Then the mock IRC server should output 'Running on port 4567, localhost' within 1 seconds
 
     Scenario: Go online
         Given a mock IRC server on localhost:4567
         When I type 'consensobot go_online "irc://localhost:4567/#test"'
-        Then the mock IRC server should output 'consensobot joined #test'
-        And the mock IRC server should not output 'consensobot left #test'
+        Then the mock IRC server should output 'consensobot joined test' within 2 seconds
+        And the mock IRC server should not output 'consensobot left test' within 2 seconds
 
     Scenario: Go offline
         Given a mock IRC server on localhost:4567
         When I type 'consensobot go_online "irc://localhost:4567/#test2"'
         When I type 'consensobot go_offline "irc://localhost:4567/#test2"'
-        Then the mock IRC server should output 'consensobot left #test2'
+        Then the mock IRC server should output 'consensobot left test2' within 2 seconds
