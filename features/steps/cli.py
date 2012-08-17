@@ -19,7 +19,6 @@ from behave import when, then
 def step(context, args=None):
     command = [os.path.join(os.path.split(__file__)[0], "../../scripts/consensobot")]
     command += shlex.split(args)
-    print command
     context.consensobot_output = subprocess.check_output(command)
 
 

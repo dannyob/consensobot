@@ -16,6 +16,15 @@ import consenso.directories
 
 
 class NoGoodFurl(Exception):
+    """ Raised if we cannot use an old foolscap URL, found in an old furlfile, or else
+    we expected to find a furl in a furlfile, but it wasn't there."""
+    pass
+
+
+class CannotChangeConsensoLogfile(Exception):
+    """ ConsensoProcess can find an old process and operate it, but it can't
+    tell it to change logfile. If a new logfile is specified when creating a new
+    ConsensoProcess, and we find an old process, we raise this error."""
     pass
 
 
@@ -27,6 +36,16 @@ def delete_file_if_exists(fname):
 
 
 class ConsensoProcess(object):
+    """ Encapsulates an external consenso long-running process.
+
+    ConsensoProcess will start a new process if necessary, but tries to find an
+    old process that's already running to talk to first.
+
+    Args:
+        pidfile: file to store (or look for) the pid
+        logfile: file to store logs
+
+    """
 
     default_furlfile = os.path.join(consenso.directories.foolscap_dir, "root.furl")
     default_pidfile = os.path.join(consenso.directories.foolscap_dir, "pid")
@@ -51,13 +70,14 @@ class ConsensoProcess(object):
             self._logfile = os.path.join(consenso.directories.log_dir, 'client.log')
         else:
             self._logfile = logfile
-            return  # if we want new logfile, we want new process too
         try:
             pid = int(file(self._pidfile, "r").read())
         except (IOError, ValueError):
             return
         if self._process_exists(pid):
             self.pid = pid
+            if logfile is not None:
+                raise CannotChangeConsensoLogfile
 
     def start(self):
         if self.pid:

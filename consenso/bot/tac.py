@@ -22,6 +22,8 @@ furlfile = os.path.join(consenso.directories.foolscap_dir, "root.furl")
 
 
 class RemoteControl(Referenceable):
+    """ Main object to remotely manage the long-running Consenso process.
+    """
     def remote_join(self, url):
         components = urlparse.urlparse(url, scheme='irc')
         if components.port:
