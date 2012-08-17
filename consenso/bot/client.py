@@ -24,36 +24,45 @@ class NoGoodFurl(Exception):
     pass
 
 
+def delete_file_if_exists(fname):
+    if fname is None:
+        return
+    if os.path.exists(fname):
+        os.unlink(fname)
+
+
 class ConsensoProcess(object):
 
-    furlfile = os.path.join(consenso.directories.foolscap_dir, "root.furl")
+    default_furlfile = os.path.join(consenso.directories.foolscap_dir, "root.furl")
     default_pidfile = os.path.join(consenso.directories.foolscap_dir, "pid")
 
-    def __init__(self, pidfile=None, logfile=None):
-        self.pid = None
-        self._furl = None
-        if not pidfile:
-            pidfile = self.default_pidfile
-        if not logfile:
-            logfile = os.path.join(consenso.directories.log_dir, 'client.log')
-        self._pidfile = pidfile
-        self._logfile = logfile
-        try:
-            pid = int(file(self._pidfile, "r").read())
-        except (IOError, ValueError):
-            return
+    def _process_exists(self, pid):
         try:
             os.kill(pid, 0)
         except (IOError, OSError) as e:
             if e.errno in (errno.ENOENT, errno.ESRCH):
-                return
+                return False
             raise
-        self.pid = pid
+        return True
+
+    def __init__(self, pidfile=None, logfile=None):
+        self.pid = None
+        self._furl = None
+        self._furlfile = self.default_furlfile
+        if not pidfile:
+            pidfile = self.default_pidfile
+        self._pidfile = pidfile
+        if not logfile:
+            self._logfile = os.path.join(consenso.directories.log_dir, 'client.log')
+        else:
+            self._logfile = logfile
+            return  # if we want new logfile, we want new process too
         try:
-            self.furl()
-        except NoGoodFurl:
-            print "I found a running ConsensoProcess but not a valid furl"
-            raise
+            pid = int(file(self._pidfile, "r").read())
+        except (IOError, ValueError):
+            return
+        if self._process_exists(pid):
+            self.pid = pid
 
     def start(self):
         if self.pid:
@@ -62,8 +71,7 @@ class ConsensoProcess(object):
         command = ['twistd', '--python={}'.format(os.path.join(this_dir, 'tac.py'))]
         command.append("--pidfile={}".format(self._pidfile))
         command.append("--logfile={}".format(self._logfile))
-        if os.path.exists(self.furlfile):
-            os.unlink(self.furlfile)
+        delete_file_if_exists(self._furlfile)
         subprocess.check_call(command, stderr=subprocess.STDOUT)
         pid = 0
         furl = ""
@@ -73,7 +81,7 @@ class ConsensoProcess(object):
             except (IOError, ValueError):
                 pid = 0
             try:
-                furl = file(self.furlfile, "r").read()
+                furl = file(self._furlfile, "r").read()
             except:
                 furl = ""
         self.pid = pid
@@ -82,10 +90,13 @@ class ConsensoProcess(object):
     def furl(self):
         if not self._furl:
             try:
-                furl = file(self.furlfile, "r").read()
+                furl = file(self._furlfile, "r").read()
             except IOError as e:
                 print e
-                print "Have you remembered to start() the ConsensoProcess?"
+                if self.pid is None:
+                    print "Have you remembered to start() the ConsensoProcess?"
+                else:
+                    print "Process is running, but cannot find valid furlfile", self._furlfile
                 raise NoGoodFurl
             self._furl = furl
         return self._furl
@@ -93,7 +104,5 @@ class ConsensoProcess(object):
     def shutdown(self):
         if self.pid:
             os.kill(self.pid, signal.SIGTERM)
-        if self._pidfile:
-            os.unlink(self._pidfile)
-        if self.furlfile:
-            os.unlink(self.furlfile)
+        delete_file_if_exists(self._pidfile)
+        delete_file_if_exists(self._furlfile)

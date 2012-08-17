@@ -15,18 +15,34 @@ __contributors__ = None
 __license__ = "GPL v3"
 
 import os
+import urlparse
 
-from twisted.application import service
+from twisted.application import service, internet
 from foolscap.api import Referenceable, Tub
 
 import consenso.directories
+from consenso.bot.ircclient import ConsensoBotFactory
 
 furlfile = os.path.join(consenso.directories.foolscap_dir, "root.furl")
 
 
 class RemoteControl(Referenceable):
-    def remote_join(self, host, port, group=None, nick=None):
-        print "I am trying to join {} on {}:{} as {}".format(group, host, port, nick)
+    def remote_join(self, url):
+        print url
+        components = urlparse.urlparse(url, scheme='irc')
+        if components.port:
+            server_port = components.port
+        else:
+            server_port = 6667
+        if components.hostname:
+            server_hostname = components.hostname
+        else:
+            server_hostname = 'localhost'
+        server_channel = components.path.strip('/')
+        print "I am trying to join {} on {}:{}".format(server_channel, server_hostname, server_port)
+        f = ConsensoBotFactory(server_channel)
+        s = internet.TCPClient(server_hostname, server_port, f, 20)
+        s.setServiceParent(application)
 
 
 def get_tub():
