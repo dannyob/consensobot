@@ -48,7 +48,7 @@ def command_markov_text(parsed_args):
     print(markov)
 
 
-def command_go_online(parsed_args):
+def command_irc_join(parsed_args):
     client = ConsensoProcess()
     client.start()
     furl = client.furl()
@@ -75,7 +75,7 @@ def command_go_online(parsed_args):
     reactor.run()
 
 
-def command_go_offline(parsed_args):
+def command_irc_leave(parsed_args):
     client = ConsensoProcess()
     client.start()
     furl = client.furl()
@@ -130,15 +130,15 @@ def main(args=sys.argv[1:]):
     parser_markov_text.add_argument('--start-word', type=str, default=None)
     parser_markov_text.set_defaults(func=command_markov_text)
 
-    parser_go_online_text = subparsers.add_parser('go_online',
-            help='Join an IRC channel')
-    parser_go_online_text.add_argument('url', type=str)
-    parser_go_online_text.set_defaults(func=command_go_online)
+    parser_irc_join_text = subparsers.add_parser('irc_join',
+            help='irc_join an IRC channel')
+    parser_irc_join_text.add_argument('url', type=str)
+    parser_irc_join_text.set_defaults(func=command_irc_join)
 
-    parser_go_online_text = subparsers.add_parser('go_offline',
+    parser_irc_join_text = subparsers.add_parser('irc_leave',
             help='Leave an IRC channel')
-    parser_go_online_text.add_argument('url', type=str)
-    parser_go_online_text.set_defaults(func=command_go_offline)
+    parser_irc_join_text.add_argument('url', type=str)
+    parser_irc_join_text.set_defaults(func=command_irc_leave)
 
  
     parsed_args = parser.parse_args(args)

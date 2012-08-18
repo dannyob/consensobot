@@ -10,12 +10,12 @@ Feature: command line IRC management
 
     Scenario: Go online
         Given a mock IRC server on localhost:4567
-        When I type 'consensobot go_online "irc://localhost:4567/#test"'
+        When I type 'consensobot irc_join "irc://localhost:4567/#test"'
         Then the mock IRC server should output 'consensobot joined test' within 2 seconds
         And the mock IRC server should not output 'consensobot left test' within 2 seconds
 
     Scenario: Go offline
         Given a mock IRC server on localhost:4567
-        When I type 'consensobot go_online "irc://localhost:4567/#test2"'
-        When I type 'consensobot go_offline "irc://localhost:4567/#test2"'
+        When I type 'consensobot irc_join "irc://localhost:4567/#test2"'
+        When I type 'consensobot irc_leave "irc://localhost:4567/#test2"'
         Then the mock IRC server should output 'consensobot left test2' within 2 seconds
