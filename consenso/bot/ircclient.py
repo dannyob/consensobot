@@ -56,25 +56,18 @@ class ConsensoBotFactory(protocol.ClientFactory):
     def clientConnectionFailed(self, connector, reason):
         print("Could not connect: %s" % (reason,))
 
-    def join(self, channel):
+    def _pass_onto_client(self, client_func, *args, **kwargs):
         if not self.signedOn:
-            def defer_join(s):
-                log.msg("I am joining {} via {} (deferred)".format(channel, s))
-                s.join(channel)
-            self.deferUntilSignedOn.addCallback(defer_join)
+            def defer_me(s):
+                client_func(s, *args, **kwargs)
+            self.deferUntilSignedOn.addCallback(defer_me)
             self.deferUntilSignedOn.addErrback(lambda s: log.err(s))
             return
         for c in self.client:
-            log.msg("I am joining {} via {}".format(channel, c))
-            c.join(channel)
+            client_func(c, *args, **kwargs)
+
+    def join(self, channel):
+        self._pass_onto_client(ConsensoBot.join, channel)
 
     def leave(self, channel):
-        if not self.signedOn:
-            def defer_leave(s):
-                log.msg("I am leaving {} via {} (deferred)".format(channel, s))
-                s.leave(channel)
-            self.deferUntilSignedOn.addCallback(defer_leave)
-            self.deferUntilSignedOn.addErrback(lambda s: log.err(s))
-        for c in self.client:
-            log.msg("I am leaving {} via {}".format(channel, c))
-            c.leave(channel)
+        self._pass_onto_client(ConsensoBot.leave, channel)
