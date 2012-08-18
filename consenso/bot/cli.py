@@ -75,6 +75,34 @@ def command_go_online(parsed_args):
     reactor.run()
 
 
+def command_go_offline(parsed_args):
+    client = ConsensoProcess()
+    client.start()
+    furl = client.furl()
+    tub = Tub()
+    tub.startService()
+
+    def got_error(err):
+        print "ERROR", err
+        reactor.stop()
+
+    def got_result(res):
+        print(res)
+
+    def got_remote(remote):
+        d = remote.callRemote("leave", parsed_args.url)
+        d.addCallback(got_result)
+        d.addCallback(lambda res: reactor.stop())
+        d.addErrback(got_error)
+        return d
+
+    d = tub.getReference(furl)
+    d.addCallback(got_remote)
+    d.addErrback(got_error)
+    reactor.run()
+
+
+
 def main(args=sys.argv[1:]):
     parser = argparse.ArgumentParser(description=metadata.get('summary'),
             epilog="Mail {} <{}> with bugs and feature requests."
@@ -107,5 +135,11 @@ def main(args=sys.argv[1:]):
     parser_go_online_text.add_argument('url', type=str)
     parser_go_online_text.set_defaults(func=command_go_online)
 
+    parser_go_online_text = subparsers.add_parser('go_offline',
+            help='Leave an IRC channel')
+    parser_go_online_text.add_argument('url', type=str)
+    parser_go_online_text.set_defaults(func=command_go_offline)
+
+ 
     parsed_args = parser.parse_args(args)
     parsed_args.func(parsed_args)

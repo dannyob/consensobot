@@ -34,10 +34,18 @@ class ConsensoControl(object):
             s = internet.TCPClient(hostname, port, f, 20)
             s.setServiceParent(self._app)
             f.join(channel)
-            return
         else:
             f = self._factories[key]
             f.join(channel)
+
+    def leave(self, channel, hostname, port):
+        key = '{}:{}'.format(hostname, port)
+        if key not in self._factories:
+            return
+        else:
+            f = self._factories[key]
+            f.leave(channel)
+
 
 
 class RemoteControl(Referenceable):
@@ -59,6 +67,20 @@ class RemoteControl(Referenceable):
         server_channel = components.path.strip('/')
         print "I am trying to join {} on {}:{}".format(server_channel, server_hostname, server_port)
         self._control.join(server_channel, server_hostname, server_port)
+
+    def remote_leave(self, url):
+        components = urlparse.urlparse(url, scheme='irc')
+        if components.port:
+            server_port = components.port
+        else:
+            server_port = 6667
+        if components.hostname:
+            server_hostname = components.hostname
+        else:
+            server_hostname = 'localhost'
+        server_channel = components.path.strip('/')
+        print "I am trying to leave {} on {}:{}".format(server_channel, server_hostname, server_port)
+        self._control.leave(server_channel, server_hostname, server_port)
 
 
 def get_tub(application):
