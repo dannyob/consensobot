@@ -53,12 +53,17 @@ class ConsensoControl(object):
             f.join(address.channel)
 
     def leave(self, address):
+        # TODO should disconnect from servers with no channels
         key = self._factory_key(address)
         if key not in self._factories:
             return
         else:
             f = self._factories[key]
             f.leave(address.channel)
+
+    def announce(self, message):
+        for (k, f) in self._factories.items():
+            f.announce(message)
 
 
 class RemoteControl(Referenceable):
@@ -83,13 +88,14 @@ class RemoteControl(Referenceable):
 
     def remote_join(self, url):
         address = self.parse_irc_uri(url)
-        print "I am trying to join {}".format(address)
         self._control.join(address)
 
     def remote_leave(self, url):
         address = self.parse_irc_uri(url)
-        print "I am trying to leave {}".format(address)
         self._control.leave(address)
+
+    def remote_announce(self, message):
+        self._control.announce(message)
 
 
 def get_tub(application):

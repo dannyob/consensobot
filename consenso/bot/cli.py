@@ -48,7 +48,7 @@ def command_markov_text(parsed_args):
     print(markov)
 
 
-def command_irc_join(parsed_args):
+def do_remote_command(command, *args, **kwargs):
     client = ConsensoProcess()
     client.start()
     furl = client.furl()
@@ -56,14 +56,14 @@ def command_irc_join(parsed_args):
     tub.startService()
 
     def got_error(err):
-        print "ERROR", err
+        print "Error while calling command remotely", err
         reactor.stop()
 
     def got_result(res):
         print(res)
 
     def got_remote(remote):
-        d = remote.callRemote("join", parsed_args.url)
+        d = remote.callRemote(command, *args, **kwargs)
         d.addCallback(got_result)
         d.addCallback(lambda res: reactor.stop())
         d.addErrback(got_error)
@@ -73,34 +73,18 @@ def command_irc_join(parsed_args):
     d.addCallback(got_remote)
     d.addErrback(got_error)
     reactor.run()
+
+
+def command_irc_join(parsed_args):
+    do_remote_command("join", parsed_args.url)
 
 
 def command_irc_leave(parsed_args):
-    client = ConsensoProcess()
-    client.start()
-    furl = client.furl()
-    tub = Tub()
-    tub.startService()
+    do_remote_command("leave", parsed_args.url)
 
-    def got_error(err):
-        print "ERROR", err
-        reactor.stop()
 
-    def got_result(res):
-        print(res)
-
-    def got_remote(remote):
-        d = remote.callRemote("leave", parsed_args.url)
-        d.addCallback(got_result)
-        d.addCallback(lambda res: reactor.stop())
-        d.addErrback(got_error)
-        return d
-
-    d = tub.getReference(furl)
-    d.addCallback(got_remote)
-    d.addErrback(got_error)
-    reactor.run()
-
+def command_irc_announce(parsed_args):
+    do_remote_command("announce", parsed_args.message)
 
 
 def main(args=sys.argv[1:]):
@@ -135,11 +119,15 @@ def main(args=sys.argv[1:]):
     parser_irc_join_text.add_argument('url', type=str)
     parser_irc_join_text.set_defaults(func=command_irc_join)
 
-    parser_irc_join_text = subparsers.add_parser('irc_leave',
+    parser_irc_leave_text = subparsers.add_parser('irc_leave',
             help='Leave an IRC channel')
-    parser_irc_join_text.add_argument('url', type=str)
-    parser_irc_join_text.set_defaults(func=command_irc_leave)
+    parser_irc_leave_text.add_argument('url', type=str)
+    parser_irc_leave_text.set_defaults(func=command_irc_leave)
 
- 
+    parser_irc_announce_text = subparsers.add_parser('irc_announce',
+            help='Say something on all IRC channels')
+    parser_irc_announce_text.add_argument('message', type=str)
+    parser_irc_announce_text.set_defaults(func=command_irc_announce)
+
     parsed_args = parser.parse_args(args)
     parsed_args.func(parsed_args)

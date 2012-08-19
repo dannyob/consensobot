@@ -34,6 +34,13 @@ class ConsensoBot(irc.IRCClient):
 
     def joined(self, channel):
         print("Joined %s." % (channel,))
+        if channel not in self.factory.channels:
+            self.factory.channels.append(channel)
+
+    def left(self, channel):
+        print("Left %s." % (channel,))
+        if channel in self.factory.channels:
+            self.factory.channels.remove(channel)
 
     def privmsg(self, user, channel, msg):
         print(msg)
@@ -42,12 +49,13 @@ class ConsensoBot(irc.IRCClient):
 class ConsensoBotFactory(protocol.ClientFactory):
     protocol = ConsensoBot
 
-    def __init__(self, channel, nickname='consensobot'):
-        self.channel = channel
+    def __init__(self, channel=None, nickname='consensobot'):
+        self.channels = [channel]
         self.nickname = nickname
         self.client = []
         self.deferUntilSignedOn = defer.Deferred()
         self.signedOn = False
+        self.join(channel)
 
     def clientConnectionLost(self, connector, reason):
         print("Lost connection (%s), reconnecting." % (reason,))
@@ -59,7 +67,12 @@ class ConsensoBotFactory(protocol.ClientFactory):
     def _pass_onto_client(self, client_func, *args, **kwargs):
         if not self.signedOn:
             def defer_me(s):
+                if s is None:
+                    log.err("Something broke the chain of returned values in this deferral")
+                    raise TypeError
+                log.msg("Deferring {}".format(s))
                 client_func(s, *args, **kwargs)
+                return s
             self.deferUntilSignedOn.addCallback(defer_me)
             self.deferUntilSignedOn.addErrback(lambda s: log.err(s))
             return
@@ -71,3 +84,8 @@ class ConsensoBotFactory(protocol.ClientFactory):
 
     def leave(self, channel):
         self._pass_onto_client(ConsensoBot.leave, channel)
+
+    def announce(self, message):
+        for i in self.channels:
+            log.msg("I am saying {} on {}".format(message, i))
+            self._pass_onto_client(ConsensoBot.say, i, message, 80)

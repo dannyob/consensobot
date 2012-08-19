@@ -13,6 +13,8 @@ from twisted.cred import checkers, portal, credentials
 from twisted.internet import reactor, defer, task
 from zope.interface import implements
 
+from consenso.bot.ircclient import ConsensoBotFactory
+
 
 class MockIRCServer (IRCUser):
 
@@ -42,11 +44,18 @@ class MockIRCServer (IRCUser):
         pass
 
     def userJoined(self, group, user):
+        IRCUser.userJoined(self, group, user)
         print("{} joined {}".format(user.name, group.name))
         sys.stdout.flush()
 
     def userLeft(self, group, user, reason=None):
+        IRCUser.userLeft(self, group, user)
         print("{} left {}".format(user.name, group.name))
+        sys.stdout.flush()
+
+    def receive(self, sender, recipient, message):
+        IRCUser.receive(self, sender, recipient, message)
+        print("{} said {} on {}".format(sender.name, message['text'], recipient.name))
         sys.stdout.flush()
 
 
@@ -87,7 +96,11 @@ if __name__ == '__main__':
 
     def end_me():
         reactor.stop()
-    d = task.deferLater(reactor, 20, end_me)  # kill myself after 20 seconds
+    d = task.deferLater(reactor, 120, end_me)  # kill myself after 20 seconds
     print "Running on port 4567, localhost"
     sys.stdout.flush()
+    # need one user to listen in for messages
+    f = ConsensoBotFactory('#test', nickname='the_watcher')
+    reactor.connectTCP('localhost', 4567, f)
+
     reactor.run()

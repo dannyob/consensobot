@@ -22,7 +22,6 @@ Feature: command line corpus management
         Then the CLI should output 'I have forgotten test_corpus.txt'
         And there should be 0 text in the corpus
 
-
     Scenario: Markov me some sentences
         Given an empty set of texts in the corpus
         When I type 'consensobot add_text test_data/test_corpus.txt'
