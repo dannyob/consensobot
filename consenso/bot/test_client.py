@@ -10,7 +10,7 @@ import os
 import os.path
 
 
-from consenso.bot.client import ConsensoProcess
+from consenso.bot.client import AnyConsensoProcess
 import twisted.trial.unittest as unittest
 
 
@@ -18,7 +18,7 @@ class Test_ConsensoProcess(unittest.TestCase):
     def setUp(self):
         if os.path.exists("/tmp/pidfile"):
             os.unlink("/tmp/pidfile")
-        self.ic = ConsensoProcess(pidfile="/tmp/pidfile")
+        self.ic = AnyConsensoProcess(pidfile="/tmp/pidfile")
         self.ic.start()
 
     def test_creates_daemon(self):
@@ -34,7 +34,7 @@ class Test_ConsensoProcess(unittest.TestCase):
 
     def test_second_process(self):
         """ Should just return with the pid and furl of previous one """
-        second_ic = ConsensoProcess(pidfile="/tmp/pidfile")
+        second_ic = AnyConsensoProcess(pidfile="/tmp/pidfile")
         self.assertEquals(second_ic.pid, self.ic.pid)
         self.assertEquals(second_ic.furl(), self.ic.furl())
 

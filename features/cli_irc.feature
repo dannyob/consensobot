@@ -1,4 +1,5 @@
 @ircserver
+@consensoserver
 Feature: command line IRC management
     In order that Consenso's IRC presence can be controlled easily
     As a CLI user

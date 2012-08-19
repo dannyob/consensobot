@@ -22,9 +22,13 @@ class NoGoodFurl(Exception):
 
 
 class CannotChangeConsensoLogfile(Exception):
-    """ ConsensoProcess can find an old process and operate it, but it can't
+    """ AnyConsensoProcess can find an old process and operate it, but it can't
     tell it to change logfile. If a new logfile is specified when creating a new
-    ConsensoProcess, and we find an old process, we raise this error."""
+    AnyConsensoProcess, and we find an old process, we raise this error."""
+    pass
+
+
+class NoExistingConsensoProcess(Exception):
     pass
 
 
@@ -35,10 +39,10 @@ def delete_file_if_exists(fname):
         os.unlink(fname)
 
 
-class ConsensoProcess(object):
+class AnyConsensoProcess(object):
     """ Encapsulates an external consenso long-running process.
 
-    ConsensoProcess will start a new process if necessary, but tries to find an
+    AnyConsensoProcess will start a new process if necessary, but tries to find an
     old process that's already running to talk to first.
 
     Args:
@@ -109,7 +113,7 @@ class ConsensoProcess(object):
             except IOError as e:
                 print e
                 if self.pid is None:
-                    print "Have you remembered to start() the ConsensoProcess?"
+                    print "Have you remembered to start() the AnyConsensoProcess?"
                 else:
                     print "Process is running, but cannot find valid furlfile", self._furlfile
                 raise NoGoodFurl
@@ -121,3 +125,21 @@ class ConsensoProcess(object):
             os.kill(self.pid, signal.SIGTERM)
         delete_file_if_exists(self._pidfile)
         delete_file_if_exists(self._furlfile)
+
+
+class NewConsensoProcess(AnyConsensoProcess):
+    def __init__(self, pidfile=None, logfile=None):
+        try:
+            e = ExistingConsensoProcess(pidfile=pidfile, logfile=logfile)
+        except NoExistingConsensoProcess:
+            e = None
+        if e:
+            e.shutdown()
+        AnyConsensoProcess.__init__(self, pidfile, logfile)
+
+
+class ExistingConsensoProcess(AnyConsensoProcess):
+    def __init__(self, pidfile=None, logfile=None):
+        AnyConsensoProcess.__init__(self, pidfile, logfile)
+        if self.pid is None:
+            raise NoExistingConsensoProcess

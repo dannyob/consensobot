@@ -16,7 +16,7 @@ from twisted.internet import reactor
 from foolscap.api import Tub
 
 from consenso.corpus import Corpus
-from consenso.bot.client import ConsensoProcess
+from consenso.bot.client import AnyConsensoProcess
 
 
 program_name = 'consensobot'
@@ -49,7 +49,7 @@ def command_markov_text(parsed_args):
 
 
 def do_remote_command(command, *args, **kwargs):
-    client = ConsensoProcess()
+    client = AnyConsensoProcess()
     client.start()
     furl = client.furl()
     tub = Tub()
